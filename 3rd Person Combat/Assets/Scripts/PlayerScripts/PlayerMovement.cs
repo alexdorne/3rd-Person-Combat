@@ -17,14 +17,18 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float directionSmoothTime = 0.1f;
     private Vector3 directionSmoothVelocity;
     
-    private Vector2 moveInput;
+    [HideInInspector] public Vector2 moveInput;
 
     [SerializeField] private float acceleration; 
     [SerializeField] private float walkSpeed; 
     [SerializeField] private float jogSpeed;
     [SerializeField] private float sprintSpeed;
 
+    [SerializeField] private float jumpForce = 5f; // Adjust this value as needed for jump height
+
     [SerializeField] private float rotationSpeed; 
+
+    private bool canMove = true; 
     private void OnEnable()
     {
         InputActions.FindActionMap("Player").Enable(); 
@@ -46,13 +50,34 @@ public class PlayerMovement : MonoBehaviour
     private void Update()
     {
         moveInput = moveAction.ReadValue<Vector2>(); 
-        animator.SetFloat("Speed", rb.linearVelocity.magnitude); 
+
+        Vector3 animationSpeed = rb.linearVelocity; 
+        animationSpeed.y = 0; 
+        animator.SetFloat("Speed", animationSpeed.magnitude); 
+
+        if (jumpAction.WasPressedThisFrame() && IsGrounded())
+        {
+            Jump(); 
+        }
 
     }
 
     private void FixedUpdate()
     {
         Move(acceleration); 
+    }
+
+    private void Jump()
+    {
+        animator.SetTrigger("Jumping"); 
+        rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse); 
+        Debug.Log("Jumping!");
+    }
+
+    private void DodgeRoll()
+    {
+        animator.SetTrigger("DodgeRoll");   
+
     }
 
     private void Move(float acceleration)
@@ -73,7 +98,11 @@ public class PlayerMovement : MonoBehaviour
         cameraRight.Normalize();
 
         Vector3 moveDirection =  cameraForward * moveInput.y + cameraRight * moveInput.x;
-        rb.AddForce(moveDirection * acceleration); 
+
+        if (IsGrounded())
+        {
+            rb.AddForce(moveDirection * acceleration); 
+        }
         
         Vector3 horizontalVelocity = rb.linearVelocity;
 
@@ -85,26 +114,34 @@ public class PlayerMovement : MonoBehaviour
             rb.linearVelocity = new Vector3(limitedVelocity.x, rb.linearVelocity.y, limitedVelocity.z);
         }
 
-        RotateTowardsMovementDirection(moveDirection);
-
-        if (IsGrounded())
+        if (moveInput.magnitude > 0)
         {
-            
-            Debug.Log("Grounded");
+            rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ; 
+            RotateTowardsMovementDirection(moveDirection);
         }
+        else
+        {
+            rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY |RigidbodyConstraints.FreezeRotationZ; 
+        }
+
     }
 
     private bool IsGrounded()
     {
+        float rayLength = 1.2f;
         int groundLayer = LayerMask.GetMask("Ground");
-        return Physics.Raycast(transform.position, Vector3.down, 0.1f + Physics.defaultContactOffset, groundLayer); 
+
+        CapsuleCollider capsule = GetComponent<CapsuleCollider>();
+        Vector3 origin = transform.localPosition + new Vector3(0, 1, 0);
+
+
+        return Physics.Raycast(origin, Vector3.down, rayLength, groundLayer);
     }
 
     private void RotateTowardsMovementDirection(Vector3 moveDirection)
     {
         if (moveInput.sqrMagnitude > 0.01f)
         {
-            // Smooth the move direction
             smoothedMoveDirection = Vector3.SmoothDamp(
                 smoothedMoveDirection,
                 moveDirection,

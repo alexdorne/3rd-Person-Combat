@@ -17,9 +17,13 @@ public class ThirdPersonCamera : MonoBehaviour
     [SerializeField] private float moveSpeed;
     [SerializeField] private float distance; 
     [SerializeField] private float height;
+    [SerializeField] private float autoRotateSpeed = 2f; 
+
+
 
     private float yaw = 0f;
     private float pitch = 20f;
+
 
     public Vector3 forwardDirection; 
     public Vector3 rightDirection; 
@@ -49,6 +53,19 @@ public class ThirdPersonCamera : MonoBehaviour
             pitch -= lookInput.y * sensitivity * Time.deltaTime;
             pitch = Mathf.Clamp(pitch, -40f, 40f); // Limit pitch to prevent flipping
         }
+        else
+    {
+        PlayerMovement playerMovement = playerTransform.GetComponent<PlayerMovement>();
+        if (playerMovement != null && playerMovement.moveInput.magnitude > 0.01f)
+        {
+            Vector3 playerForward = playerTransform.forward;
+            playerForward.y = 0;
+            playerForward.Normalize();
+            float targetYaw = Mathf.Atan2(playerForward.x, playerForward.z) * Mathf.Rad2Deg;
+
+            yaw = Mathf.LerpAngle(yaw, targetYaw, autoRotateSpeed * Time.deltaTime);
+        }
+    }
 
         Vector3 offset = new Vector3(0, height, -distance); 
         Quaternion rotation = Quaternion.Euler(pitch, yaw, 0);
