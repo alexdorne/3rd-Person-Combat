@@ -44,6 +44,7 @@ public class PlayerMovement : MonoBehaviour
     {
         InputActions.Player.Jump.performed -= ctx => Jump();
         InputActions.Player.DodgeRoll.performed -= ctx => DodgeRoll();
+
     }
 
     private void Awake()
@@ -84,7 +85,6 @@ public class PlayerMovement : MonoBehaviour
 
     private void DodgeRoll()
     {
-        animator.SetTrigger("DodgeRoll");   
 
         StartCoroutine(DodgeRolling());
     }
@@ -93,7 +93,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (moveInput.magnitude > 0)
         {
-            animator.SetTrigger("DodgeRolling");
+            animator.SetTrigger("DodgeRoll");   
 
             playerCollider.excludeLayers = LayerMask.GetMask("Enemy"); 
 
@@ -196,5 +196,17 @@ public class PlayerMovement : MonoBehaviour
                 );
             }
         }
+    }
+
+    public void DisableMovement()
+    {
+        canMove = false; 
+        animator.SetBool("CanMove", false); // Disable movement in the animator
+    }
+
+    public void EnableMovement()
+    {
+        canMove = true;
+        animator.SetBool("CanMove", true); // Re-enable movement in the animator
     }
 }

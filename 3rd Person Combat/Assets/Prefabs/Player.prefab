@@ -44,6 +44,7 @@ GameObject:
   - component: {fileID: 4107457574972487425}
   - component: {fileID: 6385390787733449633}
   - component: {fileID: 3111195922220731054}
+  - component: {fileID: 6122863237042154632}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -129,7 +130,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41129467d851f6942b66df6c5f30f34c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  InputActions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   thirdPersonCamera: {fileID: 0}
   animator: {fileID: 8485230280802418576}
   directionSmoothTime: 0.1
@@ -138,8 +138,78 @@ MonoBehaviour:
   walkSpeed: 3
   jogSpeed: 1
   sprintSpeed: 7
-  jumpForce: 1
+  rollForce: 100
+  jumpForce: 300
   rotationSpeed: 1000
+--- !u!114 &6122863237042154632
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3397688387270699358}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 315b5f63a2213ae4e8955e5c389cdd4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  swordCollider: {fileID: 8510536062597280322}
+  animator: {fileID: 8485230280802418576}
+  attackCooldown: 1.5
+  maxComboInterval: 3
+--- !u!1 &4405248246244685522
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3640246346318871671}
+  - component: {fileID: 8510536062597280322}
+  m_Layer: 0
+  m_Name: SwordCollider
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3640246346318871671
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4405248246244685522}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.026336337, y: 0.14292088, z: -0.0014969256, w: 0.98938257}
+  m_LocalPosition: {x: 0.196, y: -0.017, z: 0.581}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8819004085313138833}
+  m_LocalEulerAnglesHint: {x: 3.012, y: 16.446, z: 0.262}
+--- !u!65 &8510536062597280322
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4405248246244685522}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.13381124, y: 0.12223609, z: 0.7396191}
+  m_Center: {x: -0.048811622, y: -0.009956647, z: -0.13019425}
 --- !u!1001 &375790960380547959
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -194,7 +264,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 9175088765034030054, guid: e1c8a2a19748d804bbe81526044b1621, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3640246346318871671}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e1c8a2a19748d804bbe81526044b1621, type: 3}
       insertIndex: -1
@@ -219,7 +292,7 @@ Animator:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 717895549189369382}
   m_Enabled: 1
-  m_Avatar: {fileID: 0}
+  m_Avatar: {fileID: 9000000, guid: bbf90bba3c406174787ddeda7cceb82c, type: 3}
   m_Controller: {fileID: 9100000, guid: e74681be6f42fbd41b77913d07ec1e77, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
@@ -232,3 +305,8 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!4 &8819004085313138833 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 9175088765034030054, guid: e1c8a2a19748d804bbe81526044b1621, type: 3}
+  m_PrefabInstance: {fileID: 375790960380547959}
+  m_PrefabAsset: {fileID: 0}
