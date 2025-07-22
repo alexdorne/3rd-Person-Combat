@@ -3,9 +3,7 @@ using UnityEngine.InputSystem;
 
 public class ThirdPersonCamera : MonoBehaviour
 {
-    InputActionAsset InputActions;
-
-    private InputAction lookAction;
+    InputSystem_Actions InputActions;
 
     private Vector2 lookInput;
 
@@ -30,17 +28,18 @@ public class ThirdPersonCamera : MonoBehaviour
 
     private void Awake()
     {
-        lookAction = InputSystem.actions.FindAction("Look"); 
+        InputActions = new InputSystem_Actions();
+        InputActions.Player.Enable();
     }
 
     private void LateUpdate()
     {
-        lookInput = lookAction.ReadValue<Vector2>();
+        lookInput = InputActions.Player.Look.ReadValue<Vector2>();
         //lookInput.Normalize(); 
 
         float sensitivity = controllerLookSpeed;
 
-        var device = lookAction.activeControl?.device;
+        var device = InputActions.Player.Look.activeControl?.device;
         if (device is Mouse)
         {
             sensitivity = mouseLookSpeed; 

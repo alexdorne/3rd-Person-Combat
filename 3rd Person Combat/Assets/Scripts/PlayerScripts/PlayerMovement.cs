@@ -1,12 +1,10 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public InputActionAsset InputActions;
-
-    private InputAction moveAction; 
-    private InputAction jumpAction; 
+    InputSystem_Actions InputActions;
 
     [SerializeField] ThirdPersonCamera thirdPersonCamera; 
 
@@ -16,13 +14,17 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 smoothedMoveDirection;
     [SerializeField] private float directionSmoothTime = 0.1f;
     private Vector3 directionSmoothVelocity;
-    
+
+    CapsuleCollider playerCollider;
+
     [HideInInspector] public Vector2 moveInput;
 
     [SerializeField] private float acceleration; 
     [SerializeField] private float walkSpeed; 
     [SerializeField] private float jogSpeed;
     [SerializeField] private float sprintSpeed;
+
+    [SerializeField] private float rollForce; 
 
     [SerializeField] private float jumpForce = 5f; // Adjust this value as needed for jump height
 
@@ -31,34 +33,40 @@ public class PlayerMovement : MonoBehaviour
     private bool canMove = true; 
     private void OnEnable()
     {
-        InputActions.FindActionMap("Player").Enable(); 
+        InputActions = new InputSystem_Actions();
+        InputActions.Player.Enable();
+        InputActions.Player.Jump.performed += ctx => Jump();
+        InputActions.Player.DodgeRoll.performed += ctx => DodgeRoll();
+
+
     }
     private void OnDisable()
     {
-        InputActions.FindActionMap("Player").Disable();
+        InputActions.Player.Jump.performed -= ctx => Jump();
+        InputActions.Player.DodgeRoll.performed -= ctx => DodgeRoll();
     }
 
     private void Awake()
     {
-        moveAction = InputSystem.actions.FindAction("Move");
-        jumpAction = InputSystem.actions.FindAction("Jump");
         rb = GetComponent<Rigidbody>();
-
+        playerCollider = GetComponent<CapsuleCollider>();
 
     }
 
     private void Update()
     {
-        moveInput = moveAction.ReadValue<Vector2>(); 
+        moveInput = InputActions.Player.Move.ReadValue<Vector2>();
 
         Vector3 animationSpeed = rb.linearVelocity; 
         animationSpeed.y = 0; 
         animator.SetFloat("Speed", animationSpeed.magnitude); 
+        animator.SetFloat("VerticalSpeed", rb.linearVelocity.y);
+        animator.SetBool("Grounded", IsGrounded()); 
 
-        if (jumpAction.WasPressedThisFrame() && IsGrounded())
-        {
-            Jump(); 
-        }
+        //if (jumpAction.WasPressedThisFrame() && IsGrounded())
+        //{
+        //    Jump(); 
+        //}
 
     }
 
@@ -78,6 +86,30 @@ public class PlayerMovement : MonoBehaviour
     {
         animator.SetTrigger("DodgeRoll");   
 
+        StartCoroutine(DodgeRolling());
+    }
+
+    private IEnumerator DodgeRolling()
+    {
+        if (moveInput.magnitude > 0)
+        {
+            animator.SetTrigger("DodgeRolling");
+
+            playerCollider.excludeLayers = LayerMask.GetMask("Enemy"); 
+
+            // Calculate roll direction based on current movement direction  
+            Vector3 rollDirection = (thirdPersonCamera.forwardDirection * moveInput.y + thirdPersonCamera.rightDirection * moveInput.x).normalized;
+
+            // Apply impulse force for the roll  
+            rb.AddForce(rollDirection * rollForce, ForceMode.Impulse);
+
+
+            float rollDuration = 0.6f; // Duration of the roll animation  
+            yield return new WaitForSeconds(rollDuration);
+
+            playerCollider.excludeLayers = LayerMask.GetMask("Nothing"); // Reset the collider layers after rolling
+
+        }
     }
 
     private void Move(float acceleration)
@@ -99,9 +131,13 @@ public class PlayerMovement : MonoBehaviour
 
         Vector3 moveDirection =  cameraForward * moveInput.y + cameraRight * moveInput.x;
 
-        if (IsGrounded())
+        if (canMove)
         {
             rb.AddForce(moveDirection * acceleration); 
+        }
+
+        if (IsGrounded())
+        {
         }
         
         Vector3 horizontalVelocity = rb.linearVelocity;

@@ -1481,12 +1481,24 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3111195922220731054, guid: ebd6876e8558f3140853425db6c5eadd, type: 3}
+      propertyPath: jumpForce
+      value: 300
+      objectReference: {fileID: 0}
+    - target: {fileID: 3111195922220731054, guid: ebd6876e8558f3140853425db6c5eadd, type: 3}
+      propertyPath: rollForce
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 3111195922220731054, guid: ebd6876e8558f3140853425db6c5eadd, type: 3}
       propertyPath: thirdPersonCamera
       value: 
       objectReference: {fileID: 330585548}
     - target: {fileID: 3397688387270699358, guid: ebd6876e8558f3140853425db6c5eadd, type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 8485230280802418576, guid: ebd6876e8558f3140853425db6c5eadd, type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
