@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -36,6 +37,9 @@ public class PlayerMovement : MonoBehaviour
     private bool canMove = true;
     private bool canRotate = true;
 
+
+    [SerializeField] Slider healthSlider; 
+
     [SerializeField] int maxHealth = 5;
 
     private int health; 
@@ -50,6 +54,7 @@ public class PlayerMovement : MonoBehaviour
         set
         {
             health = Mathf.Clamp(value, 0, maxHealth);
+            healthSlider.value = health; 
             if (health <= 0)
             {
                 // Handle player death here
