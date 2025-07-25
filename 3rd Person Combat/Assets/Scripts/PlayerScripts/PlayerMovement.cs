@@ -28,9 +28,39 @@ public class PlayerMovement : MonoBehaviour
 
     [SerializeField] private float jumpForce = 5f; // Adjust this value as needed for jump height
 
-    [SerializeField] private float rotationSpeed; 
+    [SerializeField] private float rotationSpeed;
 
-    private bool canMove = true; 
+    [SerializeField] private float hitCooldown = 0.5f; // Cooldown time between hits
+    float timeBetweenHits; 
+
+    private bool canMove = true;
+    private bool canRotate = true;
+
+    [SerializeField] int maxHealth = 5;
+
+    private int health; 
+
+    public int Health
+    {
+        get
+        {
+            return health;
+        }
+
+        set
+        {
+            health = Mathf.Clamp(value, 0, maxHealth);
+            if (health <= 0)
+            {
+                // Handle player death here
+                Debug.Log("Player has died.");
+                DisableMovement(); // Disable movement on death
+                DisableBodyRotation(); // Disable body rotation on death
+                animator.SetBool("Dead", true); // Trigger death animation
+            }
+        }
+    }
+
     private void OnEnable()
     {
         InputActions = new InputSystem_Actions();
@@ -49,6 +79,9 @@ public class PlayerMovement : MonoBehaviour
 
     private void Awake()
     {
+        canRotate = true; // Allow rotation by default
+        canMove = true; // Allow movement by default
+        Health = maxHealth; // Initialize health to max health
         rb = GetComponent<Rigidbody>();
         playerCollider = GetComponent<CapsuleCollider>();
 
@@ -56,6 +89,10 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
+        if (timeBetweenHits < hitCooldown)
+        {
+            timeBetweenHits += Time.deltaTime; 
+        }
         moveInput = InputActions.Player.Move.ReadValue<Vector2>();
 
         Vector3 animationSpeed = rb.linearVelocity; 
@@ -176,6 +213,11 @@ public class PlayerMovement : MonoBehaviour
 
     private void RotateTowardsMovementDirection(Vector3 moveDirection)
     {
+        if (!canRotate)
+        {
+            return; 
+        }
+
         if (moveInput.sqrMagnitude > 0.01f)
         {
             smoothedMoveDirection = Vector3.SmoothDamp(
@@ -204,9 +246,28 @@ public class PlayerMovement : MonoBehaviour
         animator.SetBool("CanMove", false); // Disable movement in the animator
     }
 
+    public void DisableBodyRotation()
+    {
+        canRotate = false;
+    }
+
     public void EnableMovement()
     {
         canMove = true;
         animator.SetBool("CanMove", true); // Re-enable movement in the animator
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Enemy") && timeBetweenHits >= hitCooldown)
+        {
+            timeBetweenHits = 0; // Reset hit cooldown
+            TakeDamage(1); 
+        }
+    }
+
+    private void TakeDamage(int damage)
+    {
+        Health -= damage;
     }
 }

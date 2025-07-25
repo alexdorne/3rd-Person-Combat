@@ -7,7 +7,6 @@ public class AttackScript : MonoBehaviour
 
     PlayerMovement playerMovement;
 
-    [SerializeField] BoxCollider swordCollider; 
 
     private bool canAttack;
 
@@ -28,7 +27,6 @@ public class AttackScript : MonoBehaviour
         InputActions = new InputSystem_Actions();
         InputActions.Player.Enable();
         InputActions.Player.Attack.performed += ctx => PerformAttack();
-        swordCollider.enabled = false; // Ensure the sword collider is initially disabled
     }
 
     private void Update()
@@ -53,16 +51,13 @@ public class AttackScript : MonoBehaviour
         animator.SetTrigger("Attack"); // Trigger the attack animation
         
         lastAttackTime = 0; // Reset the last attack time
-        swordCollider.enabled = true; // Enable the sword collider to detect hits
 
         //AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
         //float animationLength = stateInfo.length; // Get the length of the current animation
 
         yield return new WaitForSeconds(1);
 
-        swordCollider.enabled = false; // Disable the sword collider after the attack animation duration
-
-        yield return new WaitForSeconds(0.5f);
+        //yield return new WaitForSeconds(0.5f);
 
         playerMovement.EnableMovement(); // Re-enable movement after the attack animation
 
