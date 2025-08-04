@@ -250,6 +250,10 @@ public class PlayerMovement : MonoBehaviour
         canMove = false; 
         animator.SetBool("CanMove", false); // Disable movement in the animator
     }
+    public void EnableBodyRotation()
+    {
+        canRotate = true;
+    }
 
     public void DisableBodyRotation()
     {
@@ -264,7 +268,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Enemy") && timeBetweenHits >= hitCooldown)
+        if (other.CompareTag("EnemyWeapon") && timeBetweenHits >= hitCooldown)
         {
             timeBetweenHits = 0; // Reset hit cooldown
             TakeDamage(1); 

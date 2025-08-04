@@ -8,18 +8,33 @@ public class AttackScript : MonoBehaviour
     PlayerMovement playerMovement;
 
 
-    private bool canAttack;
+    public bool canAttack = true;
 
-    [SerializeField] Animator animator; 
+    [SerializeField] Animator animator;
 
+    [SerializeField] int maxComboCount = 3; 
 
+    int currentCombo = 1; 
 
 
     [SerializeField] private float attackCooldown;
 
-    [SerializeField] private float maxComboInterval; 
+    [SerializeField] private float comboWindow; 
+
 
     private float lastAttackTime;
+
+
+
+    // --------------------------------------------------
+
+    bool attackQueued = false; 
+
+    float attackQueueTimer;
+
+    [SerializeField] float attackQueueMaxTime; 
+
+
 
     private void Awake()
     {
@@ -31,36 +46,81 @@ public class AttackScript : MonoBehaviour
 
     private void Update()
     {
-        if (lastAttackTime < maxComboInterval)
+        if (lastAttackTime < comboWindow)
         {
             lastAttackTime += Time.deltaTime;
         }
+        else
+        {
+            currentCombo = 1; 
+            animator.SetInteger("ComboInt", currentCombo);
+
+        }
+
+        if (attackQueueTimer < attackQueueMaxTime)
+        {
+            if (attackQueued)
+            {
+                attackQueueTimer += Time.deltaTime; 
+            }
+        }
+        else
+        {
+            attackQueued = false;
+            attackQueueTimer = 0;
+        }
+
+
+        if (canAttack && attackQueued)
+        {
+            PerformAttack();
+        }
+
+        animator.SetBool("AttackQueued", attackQueued);
+
     }
 
     private void PerformAttack()
     {
-        if (lastAttackTime >= attackCooldown)
+
+        Debug.Log($"Attempting attack, can attack? {canAttack} while attack queued is {attackQueued}"); 
+        if (canAttack)
         {
-            StartCoroutine(Attack());
+            lastAttackTime = 0; // Reset the last attack time
+            canAttack = false; 
+
+            animator.SetTrigger("Attack"); // Trigger the attack animation
+
+            if (currentCombo < 3)
+            {
+                currentCombo++;
+            }
+            else
+            {
+                currentCombo = 1; 
+            }
+
+            StartCoroutine(Attack()); 
+
+            //Debug.Log(currentCombo);
+
+
+
+        }
+        else if (attackQueued == false)
+        {
+            attackQueued = true; 
+            attackQueueTimer = 0; 
         }
     }
 
     private IEnumerator Attack()
     {
-        playerMovement.DisableMovement(); 
-        animator.SetTrigger("Attack"); // Trigger the attack animation
-        
-        lastAttackTime = 0; // Reset the last attack time
+        yield return new WaitForSeconds(0.5f);
 
-        //AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
-        //float animationLength = stateInfo.length; // Get the length of the current animation
-
-        yield return new WaitForSeconds(1);
-
-        //yield return new WaitForSeconds(0.5f);
-
-        playerMovement.EnableMovement(); // Re-enable movement after the attack animation
+        animator.SetInteger("ComboInt", currentCombo);
 
     }
+
 
 }
