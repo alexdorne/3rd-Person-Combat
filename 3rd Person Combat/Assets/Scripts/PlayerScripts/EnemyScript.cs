@@ -28,6 +28,10 @@ public class EnemyScript : MonoBehaviour
 
     private float lastAttackTime;
 
+    AudioSource audioSource;
+
+    [SerializeField] AudioClip hitSound; // Sound to play when attacking
+
     public enum EnemyState
     {
         Seeking,
@@ -39,6 +43,7 @@ public class EnemyScript : MonoBehaviour
 
     private void Start()
     {
+        audioSource = GetComponent<AudioSource>();
         currentHealth = maxHealth;
         navMeshAgent = GetComponent<NavMeshAgent>();
         navMeshAgent.stoppingDistance = attackRange; // Set the stopping distance to the attack range
@@ -122,6 +127,8 @@ public class EnemyScript : MonoBehaviour
         {
             if (timeBetweenHits >= takeDamageCooldown)
             {
+                audioSource.pitch = Random.Range(0.95f, 1.05f); // Randomize pitch for variety
+                audioSource.PlayOneShot(hitSound); // Play the hit sound
                 timeBetweenHits = 0f; // Reset the cooldown timer
                 TakeDamage(1); // Assuming the weapon deals 1 damage
             }

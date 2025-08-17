@@ -52,7 +52,8 @@ public class AttackScript : MonoBehaviour
         }
         else
         {
-            currentCombo = 1; 
+            currentCombo = 1;
+            canAttack = true; // Reset the ability to attack after the combo window has passed
             animator.SetInteger("ComboInt", currentCombo);
 
         }

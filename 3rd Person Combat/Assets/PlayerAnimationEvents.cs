@@ -6,6 +6,9 @@ public class PlayerAnimationEvents : MonoBehaviour
     [SerializeField] PlayerMovement playerMovement; // Reference to the PlayerMovement script
     [SerializeField] AttackScript attackScript; // Reference to the Animator component
 
+    [SerializeField] AudioSource audioSource;
+
+    [SerializeField] AudioClip swordSwingSound; 
 
     private void Start()
     {
@@ -49,4 +52,19 @@ public class PlayerAnimationEvents : MonoBehaviour
         attackScript.canAttack = true; // Allow the player to attack
     }
 
+    public void DisallowAttack()
+    {
+        attackScript.canAttack = false; // Disallow the player from attacking
+    }
+
+    public void PlaySwordSwingSound()
+    {
+        if (audioSource != null && swordSwingSound != null)
+        {
+            audioSource.pitch = Random.Range(0.8f, 1.2f); // Randomize pitch for variety
+            audioSource.PlayOneShot(swordSwingSound); // Play the sword swing sound
+        }
+
+    }
 }
+

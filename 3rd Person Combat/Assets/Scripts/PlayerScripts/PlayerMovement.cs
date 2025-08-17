@@ -7,6 +7,8 @@ public class PlayerMovement : MonoBehaviour
 {
     InputSystem_Actions InputActions;
 
+    AttackScript attackScript;
+
     [SerializeField] ThirdPersonCamera thirdPersonCamera; 
 
     [SerializeField] private Animator animator; 
@@ -84,6 +86,9 @@ public class PlayerMovement : MonoBehaviour
 
     private void Awake()
     {
+        attackScript = GetComponent<AttackScript>();    
+        Cursor.visible = false; // Hide the cursor
+        Cursor.lockState = CursorLockMode.Locked; // Lock the cursor to the center of the screen
         canRotate = true; // Allow rotation by default
         canMove = true; // Allow movement by default
         Health = maxHealth; // Initialize health to max health
@@ -120,6 +125,10 @@ public class PlayerMovement : MonoBehaviour
 
     private void Jump()
     {
+        if (IsGrounded() == false)
+        {
+            return; // Prevent jumping if not grounded
+        }
         animator.SetTrigger("Jumping"); 
         rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse); 
         Debug.Log("Jumping!");

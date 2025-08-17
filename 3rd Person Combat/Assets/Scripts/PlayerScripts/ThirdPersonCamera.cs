@@ -15,9 +15,11 @@ public class ThirdPersonCamera : MonoBehaviour
     [SerializeField] private float moveSpeed;
     [SerializeField] private float distance; 
     [SerializeField] private float height;
-    [SerializeField] private float autoRotateSpeed = 2f; 
+    [SerializeField] private float autoRotateSpeed = 2f;
 
+    [SerializeField] float timeBeforeAutoRotate = 0.5f; // Time before auto-rotation kicks in when no input is detected
 
+    float timeSinceLastInput = 0f; // Timer to track time since last input
 
     private float yaw = 0f;
     private float pitch = 20f;
@@ -66,21 +68,27 @@ public class ThirdPersonCamera : MonoBehaviour
 
         if (lookInput.sqrMagnitude > 0.01f)
         {
+            timeSinceLastInput = 0f; // Reset timer if there is input
             yaw += lookInput.x * sensitivity * Time.deltaTime;
             pitch -= lookInput.y * sensitivity * Time.deltaTime;
             pitch = Mathf.Clamp(pitch, -40f, 40f); // Limit pitch to prevent flipping
         }
         else
         {
-            PlayerMovement playerMovement = playerTransform.GetComponent<PlayerMovement>();
-            if (playerMovement != null && playerMovement.moveInput.magnitude > 0.01f)
-            {
-                Vector3 playerForward = playerTransform.forward;
-                playerForward.y = 0;
-                playerForward.Normalize();
-                float targetYaw = Mathf.Atan2(playerForward.x, playerForward.z) * Mathf.Rad2Deg;
+            timeSinceLastInput += Time.deltaTime; // Increment timer if no input
 
-                yaw = Mathf.LerpAngle(yaw, targetYaw, autoRotateSpeed * Time.deltaTime);
+            if (timeSinceLastInput >= timeBeforeAutoRotate)
+            {
+                PlayerMovement playerMovement = playerTransform.GetComponent<PlayerMovement>();
+                if (playerMovement != null && playerMovement.moveInput.magnitude > 0.01f)
+                {
+                    Vector3 playerForward = playerTransform.forward;
+                    playerForward.y = 0;
+                    playerForward.Normalize();
+                    float targetYaw = Mathf.Atan2(playerForward.x, playerForward.z) * Mathf.Rad2Deg;
+
+                    yaw = Mathf.LerpAngle(yaw, targetYaw, autoRotateSpeed * Time.deltaTime);
+                }
             }
         }
 
