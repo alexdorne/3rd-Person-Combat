@@ -14,7 +14,7 @@ public class EnemyScript : MonoBehaviour
 
     [SerializeField] Animator animator; 
 
-    [SerializeField] GameObject player;
+    GameObject player;
 
     [SerializeField] BoxCollider attackCollider; 
 
@@ -43,6 +43,7 @@ public class EnemyScript : MonoBehaviour
 
     private void Start()
     {
+        player = GameObject.FindGameObjectWithTag("Player"); // Find the player object by tag
         audioSource = GetComponent<AudioSource>();
         currentHealth = maxHealth;
         navMeshAgent = GetComponent<NavMeshAgent>();
